@@ -15,7 +15,7 @@ abstract class JavaTarget extends JvmTarget {
 
     protected static final String TEST_PREFIX = "test"
 
-    private static final List<String> JAVA_COMPILE_CONFIGS = ["compile"]
+    private static final List<String> JAVA_COMPILE_CONFIGS = ["compile", "implementation"]
     private static final List<String> JAVA_APT_CONFIGS = ["apt", "compileOnly"]
     public static final List<String> JAVA_PROVIDED_CONFIGS = ["provided", "compileOnly"]
 
