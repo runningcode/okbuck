@@ -34,6 +34,8 @@ dependencies {
     compile deps.build.mavenArtifact
 
     testCompile deps.test.junit
+    testCompile gradleTestKit()
+    testCompile deps.test.mockito
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {

@@ -4,6 +4,7 @@ apply plugin: 'me.tatarka.retrolambda'
 dependencies {
     compile deps.external.gson
     compile deps.external.dagger
+    implementation deps.external.rxjava
 
     compileOnly deps.apt.javax
     compileOnly deps.apt.daggerCompiler

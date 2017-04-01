@@ -28,12 +28,11 @@ final class KeystoreRuleComposer {
             File keyStoreCopy = new File(storeDir, storeFileName)
             Files.copy(keystore.storeFile.toPath(), keyStoreCopy.toPath(), StandardCopyOption.REPLACE_EXISTING)
 
-            PrintWriter writer = new PrintWriter(new FileOutputStream(new File(storeDir,
-                    storeFilePropsName)))
-            writer.println("key.alias=${keystore.alias}")
-            writer.println("key.store.password=${keystore.storePassword}")
-            writer.println("key.alias.password=${keystore.keyPassword}")
-            writer.close()
+            new File(storeDir, storeFilePropsName).withPrintWriter {
+                it.println("key.alias=${keystore.alias}")
+                it.println("key.store.password=${keystore.storePassword}")
+                it.println("key.alias.password=${keystore.keyPassword}")
+            }
 
             String store = "//.okbuck/keystore/${target.identifier.replaceAll(':', '_')}:key_store_${target.name}.keystore"
             return store
