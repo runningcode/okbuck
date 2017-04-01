@@ -22,6 +22,9 @@ import com.github.piasy.rxscreenshotdetector.RxScreenshotDetector;
 import com.uber.okbuck.example.sqldelightmodel.GithubRepo;
 import com.uber.okbuck.example.sqldelightmodel.GithubUser;
 import com.promegu.xlog.base.XLog;
+
+import java.io.InputStream;
+
 import javax.inject.Inject;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -98,6 +101,13 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(this, user.login(), Toast.LENGTH_SHORT).show();
         GithubRepo repo = GithubRepo.create(100, "OkBuck", "auto buck");
         Toast.makeText(this, repo.name() + ": " + repo.description(), Toast.LENGTH_SHORT).show();
+
+        // Make sure we can load a java resource provided in `:libraries:resources`.
+        InputStream resourceAsStream = MainActivity.class.getResourceAsStream("/default.json");
+        if (resourceAsStream == null) {
+            throw new IllegalStateException("Failed to load resource /default.json");
+        }
+
     }
 
     @Override

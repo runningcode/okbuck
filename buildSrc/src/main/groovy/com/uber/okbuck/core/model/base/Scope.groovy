@@ -39,7 +39,7 @@ class Scope {
 
         this.project = project
         sources = FileUtil.getIfAvailable(project, sourceDirs)
-        resourcesDir = FileUtil.getIfAvailable(project, resDir)
+        resourcesDir = resDir == null ? null : FileUtil.getIfAvailable(project, resDir);
         jvmArgs = jvmArguments
         this.depCache = depCache
 

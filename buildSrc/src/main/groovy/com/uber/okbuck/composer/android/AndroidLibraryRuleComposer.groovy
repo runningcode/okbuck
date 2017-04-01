@@ -62,6 +62,7 @@ final class AndroidLibraryRuleComposer extends AndroidBuckRuleComposer {
                 target.postprocessClassesCommands,
                 target.main.jvmArgs,
                 target.generateR2,
+                target.main.resourcesDir,
                 testTargets,
                 target.getExtraOpts(RuleType.ANDROID_LIBRARY))
     }

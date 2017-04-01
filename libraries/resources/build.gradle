@@ -1,0 +1,6 @@
+apply plugin: 'com.android.library'
+
+dependencies {
+    testCompile deps.test.junit
+    testCompile deps.test.assertj
+}

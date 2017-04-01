@@ -62,6 +62,7 @@ dependencies {
     compile deps.external.xlogAndroidIdle
     compile deps.apt.autoValue
 
+    compile project(':libraries:resources')
     compile project(':libraries:emptylibrary')
     devCompile project(path: ':dummylibrary', configuration: 'freeRelease')
     prodCompile project(path: ':dummylibrary', configuration: 'paidRelease')
@@ -73,6 +74,7 @@ dependencies {
     annotationProcessor deps.apt.autoValueGson
 
     testCompile project(path: ':dummylibrary', configuration: 'freeDebug')
+    testCompile deps.test.assertj
     testCompile deps.test.junit
     testCompile deps.test.mockito
     testCompile deps.support.annotations

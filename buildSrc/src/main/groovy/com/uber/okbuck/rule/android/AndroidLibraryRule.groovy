@@ -25,6 +25,7 @@ final class AndroidLibraryRule extends AndroidRule {
             List<String> postprocessClassesCommands,
             List<String> options,
             boolean generateR2,
+            String resourcesDir,
             List<String> testTargets,
             Set<String> extraOpts) {
 
@@ -47,7 +48,7 @@ final class AndroidLibraryRule extends AndroidRule {
                 options,
                 TestOptions.EMPTY,
                 generateR2,
-                null,
+                resourcesDir,
                 null,
                 testTargets,
                 null,

@@ -101,7 +101,7 @@ abstract class AndroidTarget extends JavaLibTarget {
                 project,
                 expand(compileConfigs),
                 srcDirs,
-                null,
+                project.file("src/main/resources"),
                 getJavaCompilerOptions(baseVariant))
     }
 
