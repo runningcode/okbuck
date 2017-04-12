@@ -1,3 +1,4 @@
+include ':layoutlibrary'
 include 'app'
 include 'another-app'
 include 'dummylibrary'

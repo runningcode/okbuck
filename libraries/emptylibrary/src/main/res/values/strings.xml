@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="empty_release_string">empty_release_string</string>
+    <item name="all_set_subtitle" type="string"/>
+    <item name="the_layout" type="layout"/>
+
 </resources>

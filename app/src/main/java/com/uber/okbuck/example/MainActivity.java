@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 import butterknife.BindView;
@@ -15,6 +16,7 @@ import butterknife.Unbinder;
 import com.uber.okbuck.example.common.Calc;
 import com.uber.okbuck.example.common.CalcMonitor;
 import com.uber.okbuck.example.common.IMyAidlInterface;
+import com.uber.okbuck.example.dummylibrary.AndroidModule;
 import com.uber.okbuck.example.dummylibrary.DummyActivity;
 import com.uber.okbuck.example.dummylibrary.DummyAndroidClass;
 import com.uber.okbuck.example.javalib.DummyJavaClass;
@@ -98,6 +100,9 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(this, user.login(), Toast.LENGTH_SHORT).show();
         GithubRepo repo = GithubRepo.create(100, "OkBuck", "auto buck");
         Toast.makeText(this, repo.name() + ": " + repo.description(), Toast.LENGTH_SHORT).show();
+
+        Log.d("MainActivity", "text is " + getString(R.string.all_set_subtitle));
+        getLayoutInflater().inflate(R.layout.the_layout, (ViewGroup) findViewById(android.R.id.content), false);
     }
 
     @Override
