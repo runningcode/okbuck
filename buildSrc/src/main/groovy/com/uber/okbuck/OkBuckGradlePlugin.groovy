@@ -6,12 +6,13 @@ import com.uber.okbuck.core.model.base.TargetCache
 import com.uber.okbuck.core.model.java.JavaTarget
 import com.uber.okbuck.core.task.OkBuckCleanTask
 import com.uber.okbuck.core.task.OkBuckTask
+import com.uber.okbuck.core.task.TransformTask
 import com.uber.okbuck.core.util.FileUtil
 import com.uber.okbuck.core.util.LintUtil
 import com.uber.okbuck.core.util.ProjectUtil
 import com.uber.okbuck.core.util.RetrolambdaUtil
 import com.uber.okbuck.core.util.RobolectricUtil
-import com.uber.okbuck.core.util.TransformUtil
+
 import com.uber.okbuck.extension.ExperimentalExtension
 import com.uber.okbuck.extension.IntellijExtension
 import com.uber.okbuck.extension.LintExtension
@@ -87,7 +88,7 @@ class OkBuckGradlePlugin implements Plugin<Project> {
         okbuckExt.extensions.create(TRANSFORM, TransformExtension)
 
         // Create configurations
-        project.configurations.maybeCreate(TransformUtil.CONFIGURATION_TRANSFORM)
+        project.configurations.maybeCreate(TransformTask.CONFIGURATION_TRANSFORM)
         Configuration externalOkbuck = project.configurations.maybeCreate(CONFIGURATION_EXTERNAL)
 
         // Create tasks
@@ -99,6 +100,13 @@ class OkBuckGradlePlugin implements Plugin<Project> {
             okBuckExtension = okbuckExt
         })
         okBuck.dependsOn(setupOkbuck)
+
+
+        // Fetch transform deps if needed
+        Task transform = project.tasks.create("setupTransform", TransformTask, {
+            transform = experimental.transform
+        })
+        setupOkbuck.dependsOn(transform)
 
         // Create target cache
         targetCache = new TargetCache()
@@ -122,6 +130,7 @@ class OkBuckGradlePlugin implements Plugin<Project> {
                     throw new IllegalArgumentException("Okbuck cannot be invoked without 'okbuck.wrapper' set to true. Use buckw instead")
                 }
             }
+
 
             // Configure setup task
             setupOkbuck.doLast {
@@ -149,10 +158,6 @@ class OkBuckGradlePlugin implements Plugin<Project> {
                     LintUtil.fetchLintDeps(project, lint.version)
                 }
 
-                // Fetch transform deps if needed
-                if (experimental.transform) {
-                    TransformUtil.fetchTransformDeps(project)
-                }
 
                 // Fetch Retrolambda deps if needed
                 boolean hasRetrolambda = okbuckExt.buckProjects.find {

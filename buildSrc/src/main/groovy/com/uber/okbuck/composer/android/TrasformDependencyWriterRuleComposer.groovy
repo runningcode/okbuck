@@ -1,19 +1,23 @@
 package com.uber.okbuck.composer.android
 
 import com.uber.okbuck.core.model.android.AndroidAppTarget
+import com.uber.okbuck.core.task.TransformTask
 import com.uber.okbuck.core.util.FileUtil
-import com.uber.okbuck.core.util.TransformUtil
+
 import com.uber.okbuck.rule.base.GenRule
 import org.gradle.api.Project
 
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 
+import static com.uber.okbuck.core.task.TransformTask.TRANSFORM_CACHE
+
 final class TrasformDependencyWriterRuleComposer extends AndroidBuckRuleComposer {
 
     static final String OPT_TRANSFORM_CLASS = "transform"
     static final String OPT_CONFIG_FILE = "configFile"
     static final String RUNNER_MAIN_CLASS = "com.uber.okbuck.transform.CliTransform"
+    public static final String TRANSFORM_RULE = "//" + TRANSFORM_CACHE + ":okbuck_transform";
 
     private TrasformDependencyWriterRuleComposer() {}
 
@@ -46,7 +50,7 @@ final class TrasformDependencyWriterRuleComposer extends AndroidBuckRuleComposer
                         (configFile != null ? "-Dokbuck.configFile=\"\$SRCS\" " : "") +
                         (transformClass != null ? "-Dokbuck.transformClass=\"${transformClass}\" " : "") +
 
-                        " -cp \$(location ${TransformUtil.TRANSFORM_RULE}) ${RUNNER_MAIN_CLASS}\" >> ${output};",
+                        " -cp \$(location ${TRANSFORM_RULE}) ${RUNNER_MAIN_CLASS}\" >> ${output};",
 
                 "chmod +x ${output}"]
 
@@ -60,9 +64,9 @@ final class TrasformDependencyWriterRuleComposer extends AndroidBuckRuleComposer
 
     static String getTransformConfigRuleForFile(Project project, File config) {
         String path = getTransformFilePathForFile(project, config)
-        File configFile = new File("${TransformUtil.TRANSFORM_CACHE}/${path}")
+        File configFile = new File("${TransformTask.TRANSFORM_CACHE}/${path}")
         Files.copy(config.toPath(), configFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
-        return "//${TransformUtil.TRANSFORM_CACHE}:${path}"
+        return "//${TransformTask.TRANSFORM_CACHE}:${path}"
     }
 
     private static String getTransformFilePathForFile(Project project, File config) {
