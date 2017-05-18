@@ -10,6 +10,7 @@ import com.uber.okbuck.core.model.groovy.GroovyLibTarget;
 import com.uber.okbuck.core.model.java.JavaAppTarget;
 import com.uber.okbuck.core.model.java.JavaLibTarget;
 import com.uber.okbuck.core.model.jvm.JvmTarget;
+import com.uber.okbuck.core.model.kotlin.KotlinAndroidLibTarget;
 import com.uber.okbuck.core.model.kotlin.KotlinLibTarget;
 import com.uber.okbuck.core.util.ProjectUtil;
 
@@ -59,6 +60,18 @@ public class TargetCache {
                     projectTargets = Collections.singletonMap(JvmTarget.MAIN,
                             new KotlinLibTarget(project, JvmTarget.MAIN));
                     break;
+                case KOTLIN_ANDROID_LIB:
+                    projectTargets = new HashMap<>();
+                    for (BaseVariant v : project.getExtensions()
+                        .getByType(LibraryExtension.class)
+                        .getLibraryVariants()) {
+                        Target target = new KotlinAndroidLibTarget(project, v.getName());
+                        projectTargets.put(v.getName(), target);
+                        for (BaseVariantOutput o : v.getOutputs()) {
+                            outputToTarget.put(o.getOutputFile(), target);
+                        }
+                    }
+                    break;
                 case JAVA_APP:
                     projectTargets = Collections.singletonMap(JvmTarget.MAIN,
                             new JavaAppTarget(project, JvmTarget.MAIN));
@@ -83,6 +96,7 @@ public class TargetCache {
         ProjectType type = ProjectUtil.getType(targetProject);
         switch (type) {
             case ANDROID_LIB:
+            case KOTLIN_ANDROID_LIB:
                 result = outputToTarget.get(output);
                 break;
             case GROOVY_LIB:
@@ -91,7 +105,7 @@ public class TargetCache {
                 result = getTargets(targetProject).values().iterator().next();
                 break;
             default:
-                result = null;
+                throw new IllegalStateException(type + "not handled");
         }
         return result;
     }

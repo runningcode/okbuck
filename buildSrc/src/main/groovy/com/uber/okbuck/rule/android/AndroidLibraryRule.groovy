@@ -3,7 +3,7 @@ package com.uber.okbuck.rule.android
 import com.uber.okbuck.core.model.base.RuleType
 import com.uber.okbuck.core.model.jvm.TestOptions
 
-final class AndroidLibraryRule extends AndroidRule {
+class AndroidLibraryRule extends AndroidRule {
 
     /**
      * @srcTargets , used for SqlDelight support(or other case), genrule's output will be used as src, pass empty set if not present

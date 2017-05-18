@@ -15,6 +15,8 @@ public enum RuleType {
     JAVA_BINARY,
     JAVA_LIBRARY,
     JAVA_TEST,
+    KOTLIN_ANDROID_APP("kt"),
+    KOTLIN_ANDROID_LIBRARY("kt"),
     KOTLIN_LIBRARY("kt"),
     KOTLIN_TEST("kt"),
     PREBUILT_NATIVE_LIBRARY,

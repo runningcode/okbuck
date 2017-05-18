@@ -7,7 +7,7 @@ import com.uber.okbuck.core.model.base.Target
 import com.uber.okbuck.core.util.RetrolambdaUtil
 import com.uber.okbuck.rule.android.AndroidLibraryRule
 
-final class AndroidLibraryRuleComposer extends AndroidBuckRuleComposer {
+class AndroidLibraryRuleComposer extends AndroidBuckRuleComposer {
 
     private AndroidLibraryRuleComposer() {
         // no instance
