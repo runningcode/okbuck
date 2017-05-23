@@ -13,6 +13,7 @@ import com.uber.okbuck.composer.android.AndroidTestRuleComposer
 import com.uber.okbuck.composer.android.ExopackageAndroidLibraryRuleComposer
 import com.uber.okbuck.composer.android.GenAidlRuleComposer
 import com.uber.okbuck.composer.android.KeystoreRuleComposer
+import com.uber.okbuck.composer.android.KotlinAndroidLibraryRuleComposer
 import com.uber.okbuck.composer.android.LintRuleComposer
 import com.uber.okbuck.composer.android.PreBuiltNativeLibraryRuleComposer
 import com.uber.okbuck.composer.android.TrasformDependencyWriterRuleComposer
@@ -32,6 +33,7 @@ import com.uber.okbuck.core.model.base.Target
 import com.uber.okbuck.core.model.groovy.GroovyLibTarget
 import com.uber.okbuck.core.model.java.JavaAppTarget
 import com.uber.okbuck.core.model.java.JavaLibTarget
+
 import com.uber.okbuck.core.model.kotlin.KotlinLibTarget
 import com.uber.okbuck.core.util.ProjectUtil
 import com.uber.okbuck.extension.LintExtension
@@ -85,8 +87,19 @@ final class BuckFileGenerator {
                 case ProjectType.KOTLIN_LIB:
                     rules.addAll(createRules((KotlinLibTarget) target))
                     break
+                case ProjectType.KOTLIN_ANDROID_LIB:
+                    rules.addAll(createKotlinRules((AndroidLibTarget) target))
+                    break
                 case ProjectType.ANDROID_LIB:
                     rules.addAll(createRules((AndroidLibTarget) target))
+                    break
+                case ProjectType.KOTLIN_ANDROID_APP:
+                    AndroidAppTarget androidAppTarget = (AndroidAppTarget) target
+                    List<BuckRule> targetRules = createKotlinRules(androidAppTarget)
+                    rules.addAll(targetRules)
+                    if (androidAppTarget.instrumentationTarget) {
+                        rules.addAll(createRules(androidAppTarget.instrumentationTarget, androidAppTarget, targetRules))
+                    }
                     break
                 case ProjectType.ANDROID_APP:
                     AndroidAppTarget androidAppTarget = (AndroidAppTarget) target
@@ -146,6 +159,63 @@ final class BuckFileGenerator {
         return rules
     }
 
+    private static List<BuckRule> createKotlinRules(AndroidLibTarget target, String appClass = null,
+        List<String> extraDeps = []) {
+        List<BuckRule> rules = []
+        List<BuckRule> androidLibRules = []
+
+        // Aidl
+        List<BuckRule> aidlRules = target.aidl.collect { String aidlDir ->
+            GenAidlRuleComposer.compose(target, aidlDir)
+        }
+        List<String> aidlRuleNames = aidlRules.collect { GenAidlRule rule ->
+            ":${rule.name}"
+        }
+        androidLibRules.addAll(aidlRules)
+
+        // Res
+        androidLibRules.add(AndroidResourceRuleComposer.compose(target))
+
+        // BuildConfig
+        androidLibRules.add(AndroidBuildConfigRuleComposer.compose(target))
+
+        // Jni
+        androidLibRules.addAll(target.jniLibs.collect { String jniLib ->
+            PreBuiltNativeLibraryRuleComposer.compose(target, jniLib)
+        })
+
+        List<String> deps = androidLibRules.collect { BuckRule rule ->
+            ":${rule.name}"
+        } as List<String>
+        deps.addAll(extraDeps)
+
+        // Lib
+        androidLibRules.add(KotlinAndroidLibraryRuleComposer.compose(
+            target,
+            deps,
+            aidlRuleNames,
+            appClass
+        ))
+
+        // Test
+        if (target.robolectric && target.test.sources && !target.isTest) {
+            androidLibRules.add(AndroidTestRuleComposer.compose(
+                target,
+                deps,
+                aidlRuleNames,
+                appClass))
+        }
+
+        OkBuckExtension okbuck = target.rootProject.okbuck
+        LintExtension lint = okbuck.lint
+        if (!lint.disabled) {
+            androidLibRules.addAll(LintRuleComposer.compose(target))
+        }
+
+        rules.addAll(androidLibRules)
+        return rules
+    }
+
     private static List<BuckRule> createRules(AndroidLibTarget target, String appClass = null,
                                               List<String> extraDeps = []) {
         List<BuckRule> rules = []
@@ -200,6 +270,42 @@ final class BuckFileGenerator {
         }
 
         rules.addAll(androidLibRules)
+        return rules
+    }
+
+    private static List<BuckRule> createKotlinRules(AndroidAppTarget target) {
+        List<BuckRule> rules = [] as List<BuckRule>
+        List<String> deps = [":${AndroidBuckRuleComposer.src(target)}"]
+
+        Set<BuckRule> libRules = createKotlinRules((AndroidLibTarget) target,
+            target.exopackage ? target.exopackage.appClass : null) as Set<BuckRule>
+        rules.addAll(libRules)
+
+        libRules.each { BuckRule rule ->
+            if (rule instanceof AndroidResourceRule && rule.name != null) {
+                deps.add(":${rule.name}")
+            }
+        }
+
+        AndroidManifestRule manifestRule = AndroidManifestRuleComposer.compose(target)
+        rules.add(manifestRule)
+
+        String keystoreRuleName = KeystoreRuleComposer.compose(target)
+
+        if (target.exopackage) {
+            ExopackageAndroidLibraryRule exoPackageRule =
+                ExopackageAndroidLibraryRuleComposer.compose(
+                    target)
+            rules.add(exoPackageRule)
+            deps.add(":${exoPackageRule.name}")
+        }
+
+        List<GenRule> transformGenRules = TrasformDependencyWriterRuleComposer.compose(target)
+        rules.addAll(transformGenRules)
+
+        rules.add(AndroidBinaryRuleComposer.compose(
+            target, deps, ":${manifestRule.name}", keystoreRuleName, transformGenRules))
+
         return rules
     }
 
