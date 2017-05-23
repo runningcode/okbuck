@@ -22,11 +22,16 @@ public final class KotlinUtil {
     private static final String KOTLIN_COMPILER_MODULE = "kotlin-compiler-embeddable";
     private static final String KOTLIN_RUNTIME_MODULE = "kotlin-runtime";
     private static final String KOTLIN_HOME_LOCATION = OkBuckGradlePlugin.DEFAULT_CACHE_PATH + "/kotlin_installation";
+    private static final String KOTLIN_PREVIEW_VERSION = "1.1.4-dev-330";
 
     private KotlinUtil() {}
 
     @Nullable
     public static String getKotlinVersion(Project project) {
+        // We hard code the kotlin version instead of looking it up in the plugin since a dev version
+        // of the plugin has not been released yet.
+        return KOTLIN_PREVIEW_VERSION;
+        /**
         return project.getBuildscript()
                 .getConfigurations()
                 .getByName("classpath")
@@ -41,6 +46,7 @@ public final class KotlinUtil {
                 .findFirst()
                 .map(r -> r.getModuleVersion().getId().getVersion())
                 .orElse(null);
+         **/
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
