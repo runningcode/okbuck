@@ -93,6 +93,14 @@ final class BuckFileGenerator {
                 case ProjectType.ANDROID_LIB:
                     rules.addAll(createRules((AndroidLibTarget) target))
                     break
+                case ProjectType.KOTLIN_ANDROID_APP:
+                    AndroidAppTarget androidAppTarget = (AndroidAppTarget) target
+                    List<BuckRule> targetRules = createKotlinRules(androidAppTarget)
+                    rules.addAll(targetRules)
+                    if (androidAppTarget.instrumentationTarget) {
+                        rules.addAll(createRules(androidAppTarget.instrumentationTarget, androidAppTarget, targetRules))
+                    }
+                    break
                 case ProjectType.ANDROID_APP:
                     AndroidAppTarget androidAppTarget = (AndroidAppTarget) target
                     List<BuckRule> targetRules = createRules(androidAppTarget)
@@ -262,6 +270,42 @@ final class BuckFileGenerator {
         }
 
         rules.addAll(androidLibRules)
+        return rules
+    }
+
+    private static List<BuckRule> createKotlinRules(AndroidAppTarget target) {
+        List<BuckRule> rules = [] as List<BuckRule>
+        List<String> deps = [":${AndroidBuckRuleComposer.src(target)}"]
+
+        Set<BuckRule> libRules = createKotlinRules((AndroidLibTarget) target,
+            target.exopackage ? target.exopackage.appClass : null) as Set<BuckRule>
+        rules.addAll(libRules)
+
+        libRules.each { BuckRule rule ->
+            if (rule instanceof AndroidResourceRule && rule.name != null) {
+                deps.add(":${rule.name}")
+            }
+        }
+
+        AndroidManifestRule manifestRule = AndroidManifestRuleComposer.compose(target)
+        rules.add(manifestRule)
+
+        String keystoreRuleName = KeystoreRuleComposer.compose(target)
+
+        if (target.exopackage) {
+            ExopackageAndroidLibraryRule exoPackageRule =
+                ExopackageAndroidLibraryRuleComposer.compose(
+                    target)
+            rules.add(exoPackageRule)
+            deps.add(":${exoPackageRule.name}")
+        }
+
+        List<GenRule> transformGenRules = TrasformDependencyWriterRuleComposer.compose(target)
+        rules.addAll(transformGenRules)
+
+        rules.add(AndroidBinaryRuleComposer.compose(
+            target, deps, ":${manifestRule.name}", keystoreRuleName, transformGenRules))
+
         return rules
     }
 

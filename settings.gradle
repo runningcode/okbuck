@@ -1,6 +1,7 @@
 include 'app'
 include 'another-app'
 include 'dummylibrary'
+include 'kotlinapp'
 include 'libraries:emptyResourceLibrary'
 include 'libraries:common'
 include 'libraries:customLintLibrary'

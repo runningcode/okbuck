@@ -31,6 +31,7 @@ public class TargetCache {
         if (projectTargets == null) {
             ProjectType type = ProjectUtil.getType(project);
             switch (type) {
+                case KOTLIN_ANDROID_APP:
                 case ANDROID_APP:
                     projectTargets = new HashMap<>();
                     for (BaseVariant v : project.getExtensions()
