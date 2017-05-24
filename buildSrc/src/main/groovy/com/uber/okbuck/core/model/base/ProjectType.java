@@ -7,6 +7,7 @@ public enum ProjectType {
     JAVA_APP,
     JAVA_LIB,
     KOTLIN_LIB,
+    KOTLIN_ANDROID_APP,
     KOTLIN_ANDROID_LIB,
     UNKNOWN
 }

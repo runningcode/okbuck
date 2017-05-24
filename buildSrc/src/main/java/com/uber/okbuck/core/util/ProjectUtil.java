@@ -24,7 +24,7 @@ public final class ProjectUtil {
         PluginContainer plugins = project.getPlugins();
         if (plugins.hasPlugin("kotlin-android")) {
             if (plugins.hasPlugin(AppPlugin.class)) {
-                throw new IllegalStateException("Kotlin app not supported yet.");
+                return ProjectType.KOTLIN_ANDROID_APP;
             } else if (plugins.hasPlugin(LibraryPlugin.class)) {
                 return ProjectType.KOTLIN_ANDROID_LIB;
             }

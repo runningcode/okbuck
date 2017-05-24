@@ -47,7 +47,7 @@ public class OkBuckTask extends DefaultTask {
     // Fetch Kotlin support deps if needed
     boolean hasKotlinLib = okBuckExtension.buckProjects.stream()
         .map(ProjectUtil::getType)
-        .anyMatch(type -> type == ProjectType.KOTLIN_LIB || type == ProjectType.KOTLIN_ANDROID_LIB);
+        .anyMatch(type -> type == ProjectType.KOTLIN_LIB || type == ProjectType.KOTLIN_ANDROID_LIB || type == ProjectType.KOTLIN_ANDROID_APP);
     Pair<String, String> kotlinDeps = null;
     if (hasKotlinLib) {
       kotlinDeps = KotlinUtil.setupKotlinHome(getProject());
