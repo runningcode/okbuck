@@ -83,6 +83,7 @@ abstract class AndroidRule extends BuckRule {
         if (!mSrcSet.empty) {
             printer.println("\tsrcs = glob([")
             for (String src : mSrcSet) {
+                printer.println("\t\t'${src}/**/*.java',")
                 printer.println("\t\t'${src}/**/*.${mSourceExtension}',")
             }
 
