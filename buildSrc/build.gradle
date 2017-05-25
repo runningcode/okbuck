@@ -8,6 +8,7 @@ apply from: "../dependencies.gradle"
 
 repositories {
     jcenter()
+    google()
 }
 
 tasks.withType(GroovyCompile) {
@@ -46,7 +47,7 @@ task sourcesJar(type: Jar) {
     classifier = 'sources'
 }
 
-def publishVersion = '0.20.7-SQUARE-5'
+def publishVersion = '0.20.9-SQUARE-1'
 group = 'com.uber'
 version = publishVersion
 def siteUrl = 'https://github.com/uber/okbuck'

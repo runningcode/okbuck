@@ -24,7 +24,6 @@ import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.testing.Test
 
 import java.nio.file.Paths
-
 /**
  * An Android target
  */
@@ -240,10 +239,7 @@ abstract class AndroidTarget extends JavaLibTarget {
     }
 
     String processManifestXml(GPathResult manifestXml) {
-        def sdkNode = {
-            'uses-sdk'('android:minSdkVersion': String.valueOf(minSdk),
-                    'android:targetSdkVersion': String.valueOf(targetSdk)) {}
-        }
+        def sdkNode = getSdkNode(manifestXml, minSdk, targetSdk)
         if (manifestXml.'uses-sdk'.size() == 0) {
             manifestXml.appendNode(sdkNode)
         } else {
@@ -255,9 +251,8 @@ abstract class AndroidTarget extends JavaLibTarget {
         return (builder.bind {
             mkp.yield manifestXml
         } as String)
-                .replaceAll('\\{http://schemas.android.com/apk/res/android\\}', 'android:')
-                .replaceAll('xmlns:android="http://schemas.android.com/apk/res/android"', '')
-                .replaceFirst('<manifest ', '<manifest xmlns:android="http://schemas.android.com/apk/res/android" ')
+            .replaceAll('xmlns:android="http://schemas.android.com/apk/res/android"', '')
+            .replaceFirst('<manifest ', '<manifest xmlns:android="http://schemas.android.com/apk/res/android" ')
     }
 
     private void ensureManifest() {
@@ -304,7 +299,7 @@ abstract class AndroidTarget extends JavaLibTarget {
     }
 
     private void parseManifest(String originalManifest, File mergedManifest) {
-        XmlSlurper slurper = new XmlSlurper()
+        XmlSlurper slurper = new XmlSlurper(false, false)
         GPathResult manifestXml = slurper.parseText(originalManifest)
         packageName = manifestXml.@package
 
@@ -330,6 +325,16 @@ abstract class AndroidTarget extends JavaLibTarget {
                 options.remove(index + 1)
                 options.remove(index)
             }
+        }
+    }
+
+    private static Closure getSdkNode(GPathResult manifestXml, int minSdk, int targetSdk) {
+        def sdkAttributes = manifestXml.'uses-sdk'.'**'*.attributes()[0] ?: [:]
+        sdkAttributes['android:minSdkVersion'] = String.valueOf(minSdk)
+        sdkAttributes['android:targetSdkVersion'] = String.valueOf(targetSdk)
+
+        return {
+            'uses-sdk'(sdkAttributes) {}
         }
     }
 
