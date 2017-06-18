@@ -7,6 +7,7 @@ plugins {
 apply from: "../dependencies.gradle"
 
 repositories {
+    maven { url "https://dl.bintray.com/kotlin/kotlin-eap-1.1/" }
     jcenter()
     google()
 }

@@ -4,6 +4,7 @@ buildscript {
         jcenter()
         google()
         maven { url "https://plugins.gradle.org/m2/" }
+        maven { url "https://dl.bintray.com/kotlin/kotlin-eap-1.1"}
     }
     dependencies {
         classpath deps.build.androidPlugin
@@ -20,6 +21,7 @@ allprojects { project ->
     repositories {
         jcenter()
         google()
+        maven { url "https://dl.bintray.com/kotlin/kotlin-eap-1.1"}
     }
 }
 
@@ -163,6 +165,10 @@ okbuck {
     wrapper {
         watch += ["**/*.sq"]
     }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.0'
 }
 
 gradle.buildFinished {

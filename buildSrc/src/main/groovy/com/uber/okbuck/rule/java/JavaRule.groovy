@@ -60,6 +60,8 @@ abstract class JavaRule extends BuckRule {
         if (!mSrcSet.empty) {
             printer.println("\tsrcs = glob([")
             for (String src : mSrcSet) {
+                // This results in *.java being added twice for java rules.
+                printer.println("\t\t'${src}/**/*.java',")
                 printer.println("\t\t'${src}/**/*.${mSourceExtension}',")
             }
             printer.println("\t]),")

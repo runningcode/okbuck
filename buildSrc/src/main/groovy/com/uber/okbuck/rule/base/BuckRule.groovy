@@ -2,6 +2,9 @@ package com.uber.okbuck.rule.base
 
 import com.uber.okbuck.core.model.base.RuleType
 
+import static com.uber.okbuck.core.model.base.RuleType.ANDROID_LIBRARY
+import static com.uber.okbuck.core.model.base.RuleType.KOTLIN_ANDROID_LIBRARY
+
 abstract class BuckRule {
 
     final String name
@@ -13,7 +16,8 @@ abstract class BuckRule {
     BuckRule(RuleType ruleType, String name, List<String> visibility = [], List<String> deps = [],
              Set<String> extraBuckOpts = []) {
         this.name = name
-        mRuleType = ruleType.name().toLowerCase()
+        // TODO Clean this up, the rule name generation is a bit hacky
+        mRuleType = ruleType == KOTLIN_ANDROID_LIBRARY ? ANDROID_LIBRARY.name().toLowerCase() : ruleType.name().toLowerCase()
         mVisibility = new LinkedHashSet(visibility)
         mDeps = new LinkedHashSet(deps) // de-dup dependencies
         mExtraBuckOpts = extraBuckOpts
